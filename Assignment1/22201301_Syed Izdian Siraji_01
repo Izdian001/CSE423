@@ -1,0 +1,387 @@
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+import random
+
+
+rain_arr = []  
+direction = 0.0  
+bg1_color,bg2_color,bg3_color = 0.0, 0.0, 0.0  
+
+def showHouse():
+
+    # Blue roof
+    glColor3f(0.0, 0.0, 1.0)  
+    glBegin(GL_TRIANGLES)
+    glVertex2f(200,350)
+    glVertex2f(400,420)
+    glVertex2f(600,350)
+    glEnd()
+
+    #house body
+    glColor3f(0.0, 0.5, 0.5)
+    glBegin(GL_TRIANGLES)
+    glVertex2f(220,150)
+    glVertex2f(220,350)
+    glVertex2f(580,150)
+    
+    glVertex2f(220,350)
+    glVertex2f(580,350)
+    glVertex2f(580,150)
+    
+    glEnd()    
+    #doors and windows
+    glColor3f(0.0, 0.0, 0.0)  
+
+    # Door
+    glBegin(GL_TRIANGLES)
+    glVertex2f(350,150)
+    glVertex2f(350,280)
+    glVertex2f(450,150)
+    
+    
+    glVertex2f(350,280)
+    glVertex2f(450,280)
+    glVertex2f(450,150)
+    glEnd()
+
+    # Left window
+    glBegin(GL_TRIANGLES)
+    glVertex2f(270,240)
+    glVertex2f(270,280)
+    glVertex2f(320,240)
+    
+    
+    glVertex2f(270,280)
+    glVertex2f(320,280)
+    glVertex2f(320,240)
+ 
+    glEnd()
+    
+    # Right window
+    glBegin(GL_TRIANGLES)
+    glVertex2f(480,240)
+    glVertex2f(480,280)
+    glVertex2f(530,240)
+    
+    
+    glVertex2f(480,280)
+    glVertex2f(530,280)
+    glVertex2f(530,240)
+ 
+    glEnd()
+
+    glLineWidth(1)
+    glColor3f(1.0,1.0,1.0)
+    glBegin(GL_LINES)
+    glVertex2f(270,260)
+    glVertex2f(320,260)
+    
+    glVertex2f(295,240)
+    glVertex2f(295,280)
+    
+    glVertex2f(480,260)
+    glVertex2f(530,260)
+    
+    glVertex2f(505,240)
+    glVertex2f(505,280)
+    
+    glEnd()
+       
+def drawTrees():
+    
+    glColor3f(0.0, 1.0, 0.0)
+    glBegin(GL_TRIANGLES)
+    glVertex2f(0,250)
+    glVertex2f(50,380)
+    glVertex2f(100,250)
+    
+    
+    glVertex2f(100,250)
+    glVertex2f(150,380)
+    glVertex2f(200,250)
+    
+    glColor3f(0.0, 1.0, 0.0)
+    glVertex2f(200,250)
+    glVertex2f(250,380)
+    glVertex2f(300,250)
+    
+    glVertex2f(300,250)
+    glVertex2f(350,380)
+    glVertex2f(400,250)
+ 
+    glVertex2f(400,250)
+    glVertex2f(450,380)
+    glVertex2f(500,250)
+
+    glVertex2f(500,250)
+    glVertex2f(550,380)
+    glVertex2f(600,250)
+    
+    glVertex2f(600,250)
+    glVertex2f(650,380)
+    glVertex2f(700,250)
+    
+    glVertex2f(700,250)
+    glVertex2f(750,380)
+    glVertex2f(800,250)
+              
+    glEnd()
+
+def drawGround():
+    glColor3f(0.0, 0.5, 0.0)  
+    glBegin(GL_TRIANGLES)
+    glVertex2f(0, 0)
+    glVertex2f(0, 250)
+    glVertex2f(800,0)
+    
+    glVertex2f(0, 250)
+    glVertex2f(800, 0)
+    glVertex2f(800, 250)
+    glEnd()
+
+def rain(x1, y1):
+    glLineWidth(2)
+    glColor3f(0.0, 0.5, 1.0)  
+    glBegin(GL_LINES)
+    glVertex2f(x1, y1)         
+    glVertex2f(x1, y1 - 15)    
+    glEnd()
+
+
+def animation():
+    global direction, rain_arr
+    for i in range(len(rain_arr)):
+        x, y = rain_arr[i]
+                
+        y -= 5 
+        
+        if y < 0:
+            x = random.uniform(0, 800) 
+            y = random.uniform(0, 600)  
+
+        x += direction
+        if x < 0:
+            x = 0  
+        elif x > 800:
+            x = 800  
+
+        rain_arr[i] = (x, y)
+    glutPostRedisplay()  
+
+
+def keyboardListener(key, x, y):
+    global bg1_color,bg2_color,bg3_color
+    if key == b'l':    
+        if bg3_color < 1:
+            bg1_color+=0.05
+            bg2_color+=0.05
+            bg3_color+=0.05
+    elif key == b'k':    
+        if bg3_color >= 0.0:
+            bg1_color-=0.05
+            bg2_color-=0.05
+            bg3_color-=0.05    
+    
+    glutPostRedisplay()
+    
+def specialKeyListener(key, x, y):
+    global direction
+    if key == GLUT_KEY_LEFT:  
+        direction = max(direction - 1, -3)
+    elif key == GLUT_KEY_RIGHT:  
+        direction = min(direction + 1, 3)
+    
+        
+    
+    glutPostRedisplay()
+def iterate():
+    glViewport(0, 0, 800, 600)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0.0, 800, 0.0, 600, 0.0, 1.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+def showScreen():
+    glClearColor(bg1_color, bg2_color, bg3_color, 1.0)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    
+    iterate()
+    drawGround()
+    drawTrees()
+    showHouse()
+    
+    for i in rain_arr:
+        rain(i[0], i[1])
+    
+    glutSwapBuffers()
+
+glutInit()
+glutInitDisplayMode(GLUT_RGBA)
+glutInitWindowSize(800, 600)
+glutInitWindowPosition(0, 0)
+wind = glutCreateWindow(b"423 Assignment-1 task-1")
+glutDisplayFunc(showScreen)
+glutIdleFunc(animation)
+glutKeyboardFunc(keyboardListener)
+glutSpecialFunc(specialKeyListener)
+
+for j in range(200):
+    x = random.uniform(0, 800)
+    y = random.uniform(0, 600)
+    rain_arr.append((x, y))
+
+glutMainLoop()
+
+##############################################################################################################################
+
+#task2:
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+import random
+
+dots = []          
+speed = 1.0        
+frozen = False     
+blink = False   
+isBlinking = True 
+
+def mouseListener(button, state, x, y):
+    
+    global blink
+    
+    y = 600 - y
+    
+    if button == GLUT_RIGHT_BUTTON and state == GLUT_DOWN:
+        dx, dy = random.choice([-1, 1]) , random.choice([-1, 1]) 
+        color = [random.random(), random.random(), random.random()]
+        
+        dots.append([x, y, dx, dy, color, color])
+    
+    elif button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
+        if blink == False:
+            blink = True
+        else:
+            blink = False
+
+def keyboardListener(key, x, y):
+    global frozen
+    
+        
+    if key == b' ':
+        if frozen == False:
+            frozen = True
+           
+        else:
+            frozen = False
+
+def specialKeyListener(key, x, y):
+    global speed, dots
+   
+    if frozen == False:
+        if key == GLUT_KEY_UP:
+            speed += 0.5  
+        elif key == GLUT_KEY_DOWN:
+            speed = max(0.5, speed - 0.5) 
+ 
+        for d in dots:
+            dx, dy = d[2],d[3]
+            if dx > 0:
+                dx = speed  
+            elif dx < 0:
+                dx = -speed  
+            else:
+                dx = speed  
+
+            if dy > 0:
+                dy = speed  
+            elif dy < 0:
+                dy = -speed  
+            else:
+                dy = speed  
+
+            d[2], d[3] = dx, dy
+def new_dots():
+    
+    global dots, blink, isBlinking
+    
+    if frozen == False:
+        for d in dots:
+            x,y,dx,dy = d[0],d[1],d[2],d[3]
+            
+            x += dx  
+            y += dy  
+            
+            
+            if x <= 0 or x >= 800:
+                dx *= -1  
+            if y <= 0 or y >= 600:
+                dy *= -1  
+            d[0], d[1], d[2], d[3] = x, y, dx, dy
+        
+        if blink == True:
+            for d in dots:
+                if isBlinking == True:
+                    d[4] = d[5]  
+                else:
+                    d[4] = [0, 0, 0]  
+    
+    elif    frozen == True:         
+def toggle(val):    
+    global isBlinking
+    
+    if isBlinking == True:
+        isBlinking = False
+    else:
+        isBlinking = True
+    
+    glutTimerFunc(500, toggle, 0)  
+
+def displayDots():
+    
+    glPointSize(6)  
+    
+    #
+    glBegin(GL_POINTS)
+    for d in dots:
+        glColor3f(*d[4])  
+        glVertex2f(d[0], d[1])  
+    glEnd()
+
+def showScreen():
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    
+    glClearColor(0.0, 0.0, 0.0, 1.0)
+    
+    new_dots()
+    displayDots()
+    glutSwapBuffers()
+
+def iterate():
+    glViewport(0, 0, 800, 600)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0.0, 800, 0.0, 600, 0.0, 1.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+
+glutInit()
+glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE)
+glutInitWindowSize(800, 600)
+glutInitWindowPosition(500, 300)
+wind = glutCreateWindow(b"423 Assignment-1 task-2")
+
+glutDisplayFunc(showScreen)
+glutIdleFunc(showScreen)
+glutMouseFunc(mouseListener)
+glutKeyboardFunc(keyboardListener)
+glutSpecialFunc(specialKeyListener)
+glutTimerFunc(500, toggle, 0)  
+iterate()
+glutMainLoop()
